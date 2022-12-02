@@ -1,0 +1,5 @@
+# bar.job
+type=command
+dependencies=foo
+command=echo bar
+command=echo "hellow Azkaban_bar"

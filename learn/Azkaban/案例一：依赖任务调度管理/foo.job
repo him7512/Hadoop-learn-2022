@@ -1,0 +1,4 @@
+# foo.job
+type=command
+command=echo foo
+command=echo "hellow Azkaban_foo"

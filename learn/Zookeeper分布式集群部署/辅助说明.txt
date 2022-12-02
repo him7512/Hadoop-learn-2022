@@ -1,0 +1,16 @@
+2020203116
+刘奇
+
+Zookeeper的shell操作
+
+与
+
+Zookeeper的JAVA API操作
+
+已经安装好Zookeeper分布式协调服务
+
+原来在连接完成的zookeeper中直接ctrl+C退出在重连会直接显示关闭连接然后关机。。。
+
+才知道。
+
+演示结束

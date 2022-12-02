@@ -1,0 +1,70 @@
+Azkaban——案例演示一：依赖任务调度管理
+
+刚才完成了整个Azkaban的启动过程，现在开始实验
+
+我也是第一次看，研究研究……
+
+ok，下一步项目执行，分为两种：
+	时间定时执行
+		比如我们想让这个项目在12月2日12时到14时每隔5分钟执行一次：
+		点击schedule就会保存这个项目，我把时间调近一些
+		等一会儿看一下是否运行
+		（以虚拟机时间为准的）
+		可以看到运行成功
+
+	立即执行
+		马上就执行完成了
+
+演示完毕~
+
+
+案例二：MapReduce任务调度管理
+（还是第一次操作，手生见谅）
+
+看一下要实现的操作：
+就是使用MapReduce调度一个hadoop-mapreduce-examples-2.7.4.jar包(统计单词)把hadoop中/wordcount/input/wctest.txt的单词统计出来，只不过用Azkaban调度
+
+首先上传hadoop需要统计的文件
+其次找到需要使用的jar包
+将job与jar包压缩准备上传
+使用上一个案例中的立即执行
+不断的刷新，果然出现了结果文件！
+等待执行完毕后，下载下来看看
+执行失败。。
+容我检查一下错误
+问题：job创建的时候，打错字了.
+但是不应该，网址不识别大小写，而且刚才成功创建了结果文件夹，我再找找问题
+又试了一遍还是不太行，我觉的可能是单词太多太复杂，换一个简单的试一下
+...我再研究研究
+查看了一下报错信息，看不懂……百度一下
+果不其然又失败
+看了一下大多推荐使用linux编写job文件
+明天再说，未完待续！
+晓得了晓得了，不明天说了
+首先除了第一次，报错信息都是：
+org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory hdfs://Hadoop001:9000/wordcount/input/mrjobresult already exists
+说明mrjobresult文件一但创建，就不能执行文件了，所以我们第一时间要删除这个文件
+其次报错信息：
+org.apache.hadoop.yarn.exceptions.YarnException: Unauthorized request to start container. 
+说明集群各个节点时间不同步，我去看了一下果然如此，03节点都15号了，0102才14号，于是重新设置同步时间
+下面展示完整过程：
+成功，查看一下文件
+统计成功！
+试验结束
+
+案例三：HIVE脚本任务调度管理
+现在可以说对Azkaban熟悉多了
+
+查看job文件
+查看要执行的sql指令
+查看附属文件
+...太晚了老眼昏花~
+
+演示完毕
+
+
+
+
+
+
+

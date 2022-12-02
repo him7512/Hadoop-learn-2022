@@ -1,0 +1,68 @@
+create table ods_weblog_origin(
+valid string,
+remote_addr string, 
+remote_user string, 
+time_local string, 
+request string, 
+status string,
+body_bytes_sent string,
+http_referer string, 
+http_user_agent string ) partitioned by(datestr string) row format delimited fields terminated by '\001';
+
+load data inpath '/weblog/preprocessed/' overwrite into table ods_weblog_origin partition(datestr='20210617');
+
++--------------------------+--------------------------------+--------------------------------+-------------------------------+-----------------------------------------------+---------------------------+------------------------------------+---------------------------------+------------------------------------+----------------------------+--+
+| ods_weblog_origin.valid  | ods_weblog_origin.remote_addr  | ods_weblog_origin.remote_user  | ods_weblog_origin.time_local  |           ods_weblog_origin.request           | ods_weblog_origin.status  | ods_weblog_origin.body_bytes_sent  | ods_weblog_origin.http_referer  | ods_weblog_origin.http_user_agent  | ods_weblog_origin.datestr  |
++--------------------------+--------------------------------+--------------------------------+-------------------------------+-----------------------------------------------+---------------------------+------------------------------------+---------------------------------+------------------------------------+----------------------------+--+
+| false                    | 194.237.142.21                 | -                              | 2013-09-18 06:49:18           | /wp-content/uploads/2013/07/rstudio-git3.png  | 304                       | 0                                  | "-"                             | "Mozilla/4.0(compatible;)"         | 20210617                   |
+| false                    | 163.177.71.12                  | -                              | 2013-09-18 06:49:33           | /                                             | 200                       | 20                                 | "-"                             | "DNSPod-Monitor/1.0"               | 20210617                   |
+| false                    | 163.177.71.12                  | -                              | 2013-09-18 06:49:36           | /                                             | 200                       | 20                                 | "-"                             | "DNSPod-Monitor/1.0"               | 20210617                   |
++--------------------------+--------------------------------+--------------------------------+-------------------------------+-----------------------------------------------+---------------------------+------------------------------------+---------------------------------+------------------------------------+----------------------------+--+
+
+create table ods_weblog_detail(
+valid           string, --有效标识
+remote_addr     string, --来源IP
+remote_user     string, --用户标识
+time_local      string, --访问完整时间
+daystr          string, --访问日期
+timestr         string, --访问时间
+month           string, --访问月
+day             string, --访问日
+hour            string, --访问时
+request         string, --请求的url
+status          string, --响应码 
+body_bytes_sent string, --传输字节数
+http_referer   string, --来源url
+ref_host       string, --来源的host
+ref_path       string, --来源的路径
+ref_query      string, --来源参数query
+ref_query_id   string, --来源参数query值
+http_user_agent string --客户终端标识
+) partitioned by(datestr string);
+
+create table t_ods_tmp_referurl as SELECT a.*,b.*
+FROM ods_weblog_origin a LATERAL VIEW parse_url_tuple(regexp_replace(http_referer, "\"", ""), 'HOST', 'PATH','QUERY', 'QUERY:id') b as host, path, query, query_id;
+
+create table t_ods_tmp_detail as select b.*,substring(time_local,0,10) as daystr,
+substring(time_local,12) as tmstr,
+substring(time_local,6,2) as month,
+substring(time_local,9,2) as day,
+substring(time_local,11,3) as hour
+from t_ods_tmp_referurl b;
+
+insert overwrite table ods_weblog_detail partition(datestr)
+select distinct otd.valid,otd.remote_addr,otd.remote_user,
+otd.time_local,otd.daystr,otd.tmstr,otd.month,otd.day,otd.hour,
+otr.request,otr.status,otr.body_bytes_sent,
+otr.http_referer,otr.host,otr.path,
+otr.query,otr.query_id,otr.http_user_agent,otd.daystr
+from t_ods_tmp_detail as otd,t_ods_tmp_referurl as otr 
+where otd.remote_addr=otr.remote_addr 
+and otd.time_local=otr.time_local 
+and otd.body_bytes_sent=otr.body_bytes_sent 
+and otd.request=otr.request;
+
+
+
+
+

@@ -1,0 +1,110 @@
+配置Hive-远程模式和本地模式安装
+
+结果演示：
+开启三台集群设备，启动hadoop集群
+启动mysql服务
+service mysql start
+启动Hive
+hive
+
+演示完毕
+
+1安装MySQL
+由于Centos6源已经失效，我们采用压缩包安装
+
+从官网下载
+
+这些都需要依次执行，与安装MySQL不分先后次序
+
+下面安装MySQL
+以前的方法将压缩包拷贝至Sofware目录中
+解压到server目录中
+
+再my.cnf中添加如下内容：
+[mysqld]
+bind-address=0.0.0.0
+port=3306 # 端口号
+user=mysql
+basedir=/usr/local/mysql # 安装目录
+datadir=/data/mysql #数据目录
+socket=/tmp/mysql.sock # 默认
+log-error=/data/mysql/mysql.err # 数据目录
+pid-file=/data/mysql/mysql.pid # 数据目录
+#character config
+character_set_server=utf8mb4
+symbolic-links=0
+explicit_defaults_for_timestamp=true
+
+端口号一定要是自己没有使用过的
+
+继续操作：
+./mysqld --defaults-file=/etc/my.cnf --basedir=/usr/local/mysql/ --datadir=/data/mysql/ --user=mysql --initialize
+
+./mysql 启动
+-P是端口，要与之前配置的相同
+-p是后续输入密码，是刚才保存下来的密码
+
+注意：
+为什么要修改两次密码？
+因为第一次只能修改123456这种简单密码，第二次才能修改复杂密码
+
+接下来安装Hive
+依然是导入安装包，解压
+
+修改hive-env.sh中的环境变量
+如果把LOCALHOST换成IP地址，就成远程安装了
+
+最后将jar工具包也上传
+mysql-connector-java-5.1.46.jar
+
+bin目录下执行./schematool -dbType mysql -initSchema 初始化MySQL数据库
+
+最后分发所有配置文件到另外两个机器中
+
+service mysql start-启动mysql服务
+
+格式化后若不报错，Hive配置完成
+
+Hive的管理：
+登录hive
+使用常见命令：
+
+远程服务：
+会发现shell没有反应，无法点击，新开一个界面查看jps
+
+会发现多出来一个runjar
+
+在Hadoop002中启动远程连接
+输入连接命令，发现连阿姐成功，我们控制的就是hadoop001中的Hive数据仓库!
+
+演示完毕
+
+Hive数据操作模型
+已经开启hadoop集群
+
+1Hive数据库操作
+启动hive
+
+2Hive内部表操作
+
+3Hive外部表操作
+
+4Hive分区表操作
+	4.1普通分区
+	4.2动态分区
+
+5Hive桶表操作
+
+
+Hive数据操作
+演示完毕
+
+
+
+
+
+
+
+
+
+

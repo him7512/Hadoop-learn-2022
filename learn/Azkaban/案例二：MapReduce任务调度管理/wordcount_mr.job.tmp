@@ -1,0 +1,5 @@
+# mr.job
+type=command
+command=hadoop jar hadoop-mapreduce-examples-2.7.4.jar wordcount \
+    hdfs://Hadoop001:9000/wordcount/input/word.txt \
+    hdfs://Hadoop001:9000/wordcount/input/mrjobresult

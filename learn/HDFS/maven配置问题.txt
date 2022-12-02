@@ -1,0 +1,15 @@
+C:\Users\liuqi\.m2\repository		正常eclipse安装Maven本地仓库
+
+
+ <mirrors>
+    <!-- 使用阿里云仓库 -->
+    <mirror>
+        <id>alimaven</id>
+       <mirrorOf>central</mirrorOf>
+       <name>aliyun maven</name>
+       <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+    </mirror>
+  </mirrors>
+
+
+设置-Maven-User settings

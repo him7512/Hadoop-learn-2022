@@ -1,0 +1,15 @@
+Sqoop数据导出
+
+没开录制……
+首先与之前相同在mysql userdb数据库创建一个表格
+
+这个表创建之后什么都没用，然后使用这个命令将sqoop中的数据导出到mysql这个表格中
+
+ sqoop export \
+> --connect jdbc:mysql://Hadoop001:3309/userdb \
+> --username root \
+> --password lq010705 \
+> --table emp_export \
+> --export-dir /sqoopresult
+
+数据库中一查看发现导出成功，案例就完成了

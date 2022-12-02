@@ -1,0 +1,172 @@
+export JAVA_HOME=/export/servers/jdk
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+export PATH=${JAVA_HOME}/bin:$PATH
+export HADOOP_HOME=/export/servers/hadoop-2.7.4/
+export PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:$PATH
+#日志文件存放的目录，需手动创建
+log_src_dir=/export/data/logs/log/
+#待上传文件存放的目录，需手动创建
+log_toupload_dir=/export/data/logs/toupload/
+#设置日期
+date1=`date -d last-day +%Y_%m_%d`
+#日志文件上传到hdfs的根路径
+hdfs_root_dir=/data/clickLog/$date1/ 
+#打印环境变量信息
+echo "envs: hadoop_home: $HADOOP_HOME"
+#读取日志文件的目录，判断是否有需要上传的文件
+echo "log_src_dir:"$log_src_dir
+ls $log_src_dir | while read fileName
+do
+	if [[ "$fileName" == access.log.* ]]; then
+		date=`date +%Y_%m_%d_%H_%M_%S`
+		#将文件移动到待上传目录并重命名
+		echo "moving $log_src_dir$fileName to $log_toupload_dir"xxxxx_click_log_$fileName"$date"
+		mv $log_src_dir$fileName $log_toupload_dir"xxxxx_click_log_$fileName"$date
+		#将待上传的文件path写入一个列表文件willDoing，
+		echo $log_toupload_dir"xxxxx_click_log_$fileName"$date >> $log_toupload_dir"willDoing."$date
+	fi
+done
+#找到列表文件willDoing
+ls $log_toupload_dir | grep will |grep -v "_COPY_" | grep -v "_DONE_" | while read line
+do
+	#打印信息
+	echo "toupload is in file:"$line
+	#将待上传文件列表willDoing改名为willDoing_COPY_
+	mv $log_toupload_dir$line $log_toupload_dir$line"_COPY_"
+	#读列表文件willDoing_COPY_的内容（一个一个的待上传文件名）
+	#此处的line 就是列表中的一个待上传文件的path
+	cat $log_toupload_dir$line"_COPY_" |while read line
+	do
+		#打印信息
+		echo "puting...$line to hdfs path.....$hdfs_root_dir"
+		hadoop fs -mkdir -p $hdfs_root_dir
+		hadoop fs -put $line $hdfs_root_dir
+	done
+	mv $log_toupload_dir$line"_COPY_"  $log_toupload_dir$line"_DONE_"
+done
+
+
+
+
+
+
+
+#Shell定时采集数据到HDFS
+# 配置JAVA环境变量
+export JAVA_HOME=/export/servers/jdk
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${java_home}/lib:${JRE_HOME}/lib
+export PATH=${JAVA_HOME}/bin:$PATH
+
+# 配置Hadoop环境变量
+export HADOOP_HOME=/export/servers/hadoop-2.7.4/
+export PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/sbin:$PATH
+
+
+# 添加日志文件存放目录
+log_src_dir=/export/data/logs/log/
+# 添加待上传文件存放目录
+log_toupload_dir=/export/data/logs/toupload/
+
+
+# 设置上传的HDFS目标路径，命名格式以时间结尾，并且输出打印信息。
+# 设置日期
+date1=`date -d last-day +%Y_%m_%d`
+# 日志文件上传到HDFS的根路径
+hdfs_root_dir=/data/clickLog/$date1/
+# 打印环境变量信息
+echo "envs:hadoop_home:$HADOOP_HOME"
+# 读取日志文件的目录，判断是否有需要上传的文件
+echo "log_src_dir:"$log_src_dir
+
+# 实现文件上传
+# 上传文件的过程就是遍历文件目录的过程，将文件首先移动到待上传目录，再从待上传目录中上传到HadoopHDFS中
+ls $log_src_dir | while read fileName
+do
+        if [[ "$fileName"==access.log.* ]]; then
+                date=`date +%Y_%m_%d_%H_%M_%S`
+                # 将文件移动至待上传目录并重命名
+                echo "moving $log_src_dir$fileName to
+                        $log_toupload_dir"xxxxx_click_log_$fileName"$date"
+                mv $log_src_dir$fileName $log_toupload_dir"xxxxx_click_log_$fileName"$date
+                # 将待上传的文件path写入一个列表文件 willDoing,
+                echo $log_toupload_dir "xxxxx_click_log_$fileName"$date >> $log_toupload_dir"willDoing."$date
+        fi
+done
+# 最后将文件从待上传目录传至HDFS中
+# 找到列表文件 willDoing
+ls $log_toupload_dir | grep will | grep -v "_COPY_" | grep -v "_DONE_" | while
+read line
+do
+        # 打印信息
+        echo "toupload is in file:"$line
+        # 将待上传文件列表 willDoing 改名为 willDoing_COPY_
+        mv $log_toupload_dir$line $log_toupload_dir$line"_COPY_"
+        # 读列表文件 willDoing_COPY_ 上的内容(一个个待上传的文件名)
+        # 此处的line就是列表中的一个待上传文件的path
+        cat $log_toupload_dir$line"_COPY_" | while read line
+        do 
+                # 打印信息
+                echo "puting...$line to hdfs path......$hdfs_root_dir"
+                hadoop fs -mkdir -p $hdfs_root_dir
+                hadoop fs -put $line $hdfs_root_dir
+        done
+        mv $log_toupload_dir$line"_COPY_" $log_toupload_dir$line"_DONE_"
+done
+
+
+
+
+
+
+
+export JAVA_HOME=/export/servers/jdk
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${java_home}/lib:${JRE_HOME}/lib
+export PATH=${JAVA_HOME}/bin:$PATH
+export HADOOP_HOME=/export/servers/hadoop-2.7.4/
+export PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/sbin:$PATH
+# 添加日志文件存放目录
+log_src_dir=/export/data/logs/log/
+# 添加待上传文件存放目录
+log_toupload_dir=/export/data/logs/toupload/
+# 设置日期
+date1=`date -d last-day +%Y_%m_%d`
+# 日志文件上传到HDFS的根路径
+hdfs_root_dir=/data/clickLog/$date1/
+# 打印环境变量信息
+echo "envs:hadoop_home:$HADOOP_HOME"
+# 读取日志文件的目录，判断是否有需要上传的文件
+echo "log_src_dir:"$log_src_dir
+ls $log_src_dir | while read fileName
+do
+        if [[ "$fileName"==access.log.* ]]; then
+                date=`date +%Y_%m_%d_%H_%M_%S`
+                # 将文件移动至待上传目录并重命名
+                echo "moving $log_src_dir$fileName to ！！！！！！！！！！！没有换行$log_toupload_dir"xxxxx_click_log_$fileName"$date"
+                mv $log_src_dir$fileName $log_toupload_dir"xxxxx_click_log_$fileName"$date
+                # 将待上传的文件path写入一个列表文件 willDoing,
+                echo $log_toupload_dir "xxxxx_click_log_$fileName"$date >> $log_toupload_dir"willDoing."$date
+        fi
+done
+# 最后将文件从待上传目录传至HDFS中
+# 找到列表文件 willDoing
+ls $log_toupload_dir | grep will | grep -v "_COPY_" | grep -v "_DONE_" | while
+read line
+do
+       # 打印信息
+       echo "toupload is in file:"$line
+       # 将待上传文件列表 willDoing 改名为 willDoing_COPY_
+       mv $log_toupload_dir$line $log_toupload_dir$line"_COPY_"！！！！！！！没有双引号
+       # 读列表文件 willDoing_COPY_ 上的内容(一个个待上传的文件名)
+       # 此处的line就是列表中的一个待上传文件的path
+       cat $log_toupload_dir$line"_COPY_" | while read line
+       do 
+               # 打印信息
+               echo "puting...$line to hdfs path......$hdfs_root_dir"
+               hadoop fs -mkdir -p $hdfs_root_dir
+               hadoop fs -put $line $hdfs_root_dir
+      done
+      mv $log_toupload_dir$line"_COPY_"  $log_toupload_dir$line"_DONE_"
+done
